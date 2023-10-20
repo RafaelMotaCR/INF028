@@ -1,0 +1,12 @@
+start -3 1 2 start -1 0 2 3 start 0 1 2 4 5 
+start -1 2 3 5 start -8 0 6 15 
+start -3 1 2 start -1 0 2 3 start 0 1 2 4 5 
+start -1 2 3 5 start -8 0 6 15 
+start 1 2 3 4 start 10 11 12 start 5 6 7 8 9 
+start -3 -2 -1 start 0 1 2 3 start 4 5 6 7 
+start 10 20 30 40 start 100 110 120 start 50 60 70 80 90 
+start -100 -90 -80 start -70 -60 -50 -40 start -30 -20 -10 
+start 7 14 21 start 28 35 42 49 start 56 63 70 
+start -70 -63 -56 start -49 -42 -35 -28 start -21 -14 -7 
+start 0 0 0 start 0 0 0 0 start 0 0 0 
+start -1 -1 -1 start -1 0 1 start -1 0 0 1 
