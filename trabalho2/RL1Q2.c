@@ -96,14 +96,14 @@ void push(stack * S, char * string) {
 }
 
 
-void removeLineBreak(char * str){
-  for(int i = 0; str[i] != '\0'; i++ ) { 
+void removeLineBreak(char * str) {
+  for(int i = 0; str[i] != '\0'; i++ ) {
     if(str[i] == '\n') {
-        str[i] = '\0';
+      str[i] = '\0';
       break;
     }
   }
-} 
+}
 
 int main() {
 
@@ -134,9 +134,10 @@ int main() {
     slice = strtok(line, separator);
     push(mainStack, slice); // O primeiro elemento da pilha é inserido sem verificar a ordem
     removeLineBreak(slice);
-    fprintf(fileOut, "%s%s%c", "push-", slice, ' ');
+    fprintf(fileOut, "%s%s", "push-", slice);
     slice = strtok(NULL, separator); // Em seguida, passa para o próximo elemento, que será testado
     while(slice != NULL) { // Percorre cada elemento na linha atual
+      fputc(32,fileOut);
       char * strTmp = (char *) malloc((strlen(slice) + 1) * sizeof(char));
       strcpy(strTmp, slice);
       removeLineBreak(strTmp);
@@ -158,10 +159,14 @@ int main() {
         fprintf(fileOut, "%d%c%s%c", popT, 'x',"-pop",' '); // Reporta quantas operações pop realizou
         popT = 0;
         push(mainStack, strTmp); // Insere o elemento atual na  posição correta da pilha
-        fprintf(fileOut, "%s%s%c", "push-", strTmp, ' ');
+        fprintf(fileOut, "%s%s%c", "push-", strTmp,' '); // ignora
         x = tmpStack -> tail; // X é utilizado para percorrer a pilha secundária desde o final até o começo
         while(x != NULL) {
-          fprintf(fileOut, "%s%s%c", "push-", x -> key, ' ');
+          if(x -> prev == NULL) {
+            fprintf(fileOut, "%s%s", "push-", x -> key);
+          } else {
+            fprintf(fileOut, "%s%s%c", "push-", x -> key, ' ');
+          }
           push(mainStack, x -> key); // Insere todos os elementos de volta na lista principal e os retira da secundária
           x = x -> prev;
           pop(tmpStack);
@@ -169,7 +174,7 @@ int main() {
         free(x); // Libera x e a string auxiliar
         free(strAux);
       } else { //Se o elemento estiver na posição correta, o insere na lista sem alterar os demais
-        fprintf(fileOut, "%s%s%c", "push-", strTmp, ' ');
+        fprintf(fileOut, "%s%s", "push-", strTmp);
         push(mainStack, strTmp);
       }
       slice = strtok(NULL, separator);

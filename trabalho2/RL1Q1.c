@@ -62,20 +62,47 @@ void megaInsertion(list * input){
 }
 
 
+void removeEqual(list * input, int * listSize){
+  int tmp = *listSize; 
+  list repeated;
+  int change = 0;
+  for(int i = 0; i < tmp; i++){
+    if(input[i].sum == input[i + 1].sum){
+      repeated = input[i];
+      change = 1;
+      break;
+    }
+  }
+  if(change){
+    for(int i = 0; i < tmp; i++){
+      if(input[i + 1].sum == repeated.sum){
+        input[i] = input[i + 1];
+        input[i + 1] = repeated;
+      }
+    }
+    (*listSize)--;
+  }
+  else{
+    return;
+  }
+}
+
+
 void saveToFile(list * input, int listSize, FILE * fileOut, int isLast){
   insertionSort(input, listSize);
+  int j = 0;
   for(int i = 0; i < listSize; i++){
     fprintf(fileOut, "%s", "start ");
     megaInsertion(&input[i]);
-    for(int j = 0; j < input[i].index; j++){
+    for(j = 0; j < input[i].index - 1; j++){
       fprintf(fileOut, "%d ", input[i].numberList[j]);
     }
+   fprintf(fileOut, "%d", input[i].numberList[j]);
   }
   if(!isLast){
     fputc('\n', fileOut);
   }
 }
-
 
 int main(){
   if(!fileExists("L1Q1.in")){
