@@ -75,7 +75,7 @@ void removeEqual(list * input, int * listSize){
   }
   if(change){
     for(int i = 0; i < tmp; i++){
-      if(input[i + 1].sum == repeated.sum){
+      if(input[i].sum == repeated.sum){
         input[i] = input[i + 1];
         input[i + 1] = repeated;
       }
@@ -93,11 +93,17 @@ void saveToFile(list * input, int listSize, FILE * fileOut, int isLast){
   int j = 0;
   for(int i = 0; i < listSize; i++){
     fprintf(fileOut, "%s", "start ");
+    removeEqual(input, &listSize);
     megaInsertion(&input[i]);
     for(j = 0; j < input[i].index - 1; j++){
       fprintf(fileOut, "%d ", input[i].numberList[j]);
     }
-   fprintf(fileOut, "%d", input[i].numberList[j]);
+    if(i < listSize - 1){
+      fprintf(fileOut, "%d ", input[i].numberList[j]);
+  }
+  else{
+    fprintf(fileOut, "%d", input[i].numberList[j]);
+  }
   }
   if(!isLast){
     fputc('\n', fileOut);
