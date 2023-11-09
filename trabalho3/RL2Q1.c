@@ -10,6 +10,11 @@ typedef struct Node{
 } Node;
 
 
+typedef struct Tree{
+  Node * root; // Struct that save the root of the three
+}Tree;
+
+
 int main(){
   printf("%s", "Hi! I'm Beginning this project right now, and it will take some time to get complet");
 }

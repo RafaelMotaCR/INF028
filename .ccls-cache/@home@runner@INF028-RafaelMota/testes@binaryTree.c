@@ -12,6 +12,7 @@ typedef struct Tree{
   Node * root;
 }Tree;
 
+
 Node * create_node(int Key){
   Node * node = (Node*)malloc(sizeof(node));
   node -> key = Key;
