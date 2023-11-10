@@ -15,6 +15,13 @@ typedef struct Tree{
 }Tree;
 
 
+Node * create_node(int Key){
+  Node * node = (Node*)malloc(sizeof(node));
+  node -> key = Key;
+  return node;
+}
+
+
 int main(){
   printf("%s", "Hi! I'm Beginning this project right now, and it will take some time to get complet");
 }
