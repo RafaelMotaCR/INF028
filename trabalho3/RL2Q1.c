@@ -132,6 +132,11 @@ int main()
 
     }
 
+    fclose(fileIn);
+    fclose(fileOut);
+    free(T);
+    free(line);
+
 }
 
 
@@ -260,7 +265,7 @@ void saveToFile(FILE * fOut, node * n, int isLast)
 
     if(!isLast)
     {
-        fputc('\n',fOut);
+        fputc('\n', fOut);
     }
 
 }
