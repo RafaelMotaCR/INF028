@@ -19,11 +19,42 @@ typedef struct tree
 } tree;
 
 
+int fileCreate (char * path) 
+{
+  FILE * fileTest;
+  fileTest = fopen(path, "w");
+
+  if(fileTest == NULL) 
+  {
+    return 0;
+  }
+
+  fclose(fileTest);
+  return 1;
+}
+
+
+int fileExists(char * path) 
+{
+  FILE * fileTest;
+  fileTest = fopen(path, "r");
+
+  if(fileTest == NULL) 
+  {
+    return 0;
+  }
+
+  fclose(fileTest);
+  return 1;
+}
+
+
 node * createNode(int k){
     node * tmp = (node*) malloc(sizeof(node));
     if(tmp!= NULL)
     {
         tmp -> key = k;
+        tmp -> level = 0;
         tmp -> father = NULL;
         tmp -> left = NULL;
         tmp -> right = NULL;
@@ -86,26 +117,45 @@ node * insertTree(tree * T, int k)
 }
 
 
-void inorder(node * x)
+int totalLR(node * x)
+{
+    if(x == NULL){
+        return 0;
+    }
+
+    int sum = x -> key;
+    sum += totalLR(x -> left);
+    sum += totalLR(x -> right);
+    return sum;
+}
+
+
+void inorder(tree * T, node * x)
 {
     if(x != NULL)
     {
-        inorder(x -> left);
+        inorder(T, x -> left);
         printf("%d ", x -> key);
-        inorder(x -> right);
+        printf("(%d) ", totalLR(x -> right) - totalLR(x -> left));
+        inorder(T, x -> right);
     }
 }
 
 
 int main(){
-    int input = 1;
     tree * T = initTree();
-    while(input){
-        printf("> Enter a num: ");
-        scanf("%d", & input);
-        printf("Level: %d.\n", insertTree(T, input) -> level);
-        insertTree(T, input);
-    }
-    inorder(T -> root);
+    insertTree(T,15);
+    insertTree(T,2);
+    insertTree(T,5);
+    insertTree(T,19);
+    insertTree(T,2);
+    insertTree(T,22);
+    insertTree(T,4);
+    insertTree(T,9);
+    insertTree(T,0);
+    insertTree(T,3);
+    insertTree(T,4);
+    insertTree(T,5);
+    inorder(T, T -> root);
     return EXIT_SUCCESS;
 }
