@@ -145,20 +145,18 @@ void printTree(node* root, int space) {
 }
 
 
-void freeTreeNodes(node *root) {
-    if (root != NULL) {
-        // First free the left and right subtrees
-        freeTreeNodes(root -> left);
-        freeTreeNodes(root -> right);
-        // Then free the current node
-        free(root);
+void freeNode(node * x) {
+    if (x != NULL) {
+        freeNode(x->left);
+        freeNode(x->right);
+        free(x);
     }
 }
 
 
-void freeTree(tree *T) {
-    freeTreeNodes(T -> root);
-    T -> root = NULL; // Reset the root pointer to indicate an empty tree
+void freeTree(tree * T) {
+    freeNode(T->root);
+    free(T);
 }
 
 
@@ -204,10 +202,12 @@ int main()
         if(fgets(line, lineMaxSize, fileIn) != NULL)
         {
             freeTree(T);
+            T = initTree();
             printf("\n");
         }
         else{
             freeTree(T);
+            T = initTree();
             printf("\n> I'm at the last line, buddy!\n");
             break;
         }
