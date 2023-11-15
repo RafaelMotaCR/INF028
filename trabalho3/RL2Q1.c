@@ -69,7 +69,7 @@ node * createNode(int k)
 }
 
 
-void insertTree(tree * T, int k)
+node * insertTree(tree * T, int k)
 {
 
     node * y = NULL;
@@ -107,8 +107,58 @@ void insertTree(tree * T, int k)
         y -> left = new;
     }
 
-    printf("level: %d\n", new -> level);
+   return new;
 
+}
+
+
+void inorder_tree_walk(node * x){
+    if( x!= NULL){
+        inorder_tree_walk(x->left);
+        printf(" %d ", x->key);
+        inorder_tree_walk(x->right);
+    }
+}
+
+
+void printTree(node* root, int space) {
+    // Base case
+    if (root == NULL) {
+        return;
+    }
+
+    // Increase distance between levels
+    space += 5;
+
+    // Process right child first
+    printTree(root->right, space);
+
+    // Print current node after space
+    printf("\n");
+    for (int i = 5; i < space; i++) {
+        printf(" ");
+    }
+    printf("%d\n", root->key);
+
+    // Process left child
+    printTree(root->left, space);
+}
+
+
+void freeTreeNodes(node *root) {
+    if (root != NULL) {
+        // First free the left and right subtrees
+        freeTreeNodes(root -> left);
+        freeTreeNodes(root -> right);
+        // Then free the current node
+        free(root);
+    }
+}
+
+
+void freeTree(tree *T) {
+    freeTreeNodes(T -> root);
+    T -> root = NULL; // Reset the root pointer to indicate an empty tree
 }
 
 
@@ -123,6 +173,7 @@ int main()
         return EXIT_FAILURE;
 
     }
+
     if(!fileExists("L2Q1.out"))
     {
 
@@ -137,35 +188,31 @@ int main()
     char * slice;
     char * line = (char*) malloc(lineMaxSize * sizeof(char));
 
+    tree * T = initTree();
+
     fgets(line, lineMaxSize, fileIn);
     while(line != NULL)
     {
         slice = strtok(line, separator);
         while (slice != NULL)
         {
-            int tmp = atoi(slice);
-            printf("%d ", tmp);
+            int tmp = atoi(slice);    
+            printf("%d ", insertTree(T, tmp) -> level);
             slice = strtok(NULL, separator);
 
         }
         if(fgets(line, lineMaxSize, fileIn) != NULL)
         {
+            freeTree(T);
             printf("\n");
-            //
         }
         else{
-            printf("\nI'm at the last line, buddy\n");
+            freeTree(T);
+            printf("\n> I'm at the last line, buddy!\n");
             break;
         }
+        T = initTree();
 
     }
-
-    tree * T = initTree();
-    insertTree(T, 5);
-    insertTree(T, 6);
-    insertTree(T, 7);
-    insertTree(T, 6);
-    insertTree(T, 5);
-    insertTree(T, 4);
 
 }
