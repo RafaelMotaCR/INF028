@@ -64,6 +64,9 @@ node * createNode(int k)
     {
         tmp -> key = k;
         tmp -> level = 0;
+        tmp -> right = NULL;
+        tmp -> left = NULL;
+        tmp -> father = NULL;
     }
     return tmp;
 }
@@ -112,53 +115,32 @@ node * insertTree(tree * T, int k)
 }
 
 
-void inorder_tree_walk(node * x){
-    if( x!= NULL){
-        inorder_tree_walk(x->left);
-        printf(" %d ", x->key);
-        inorder_tree_walk(x->right);
-    }
-}
+void freeTree(node * root) {
 
-
-void printTree(node* root, int space) {
-    // Base case
-    if (root == NULL) {
+    if (root == NULL) 
         return;
-    }
 
-    // Increase distance between levels
-    space += 5;
-
-    // Process right child first
-    printTree(root->right, space);
-
-    // Print current node after space
-    printf("\n");
-    for (int i = 5; i < space; i++) {
-        printf(" ");
-    }
-    printf("%d\n", root->key);
-
-    // Process left child
-    printTree(root->left, space);
+    freeTree(root->left);
+    freeTree(root->right);
+    free(root);
 }
 
 
-void freeNode(node * x) {
-    if (x != NULL) {
-        freeNode(x->left);
-        freeNode(x->right);
-        free(x);
+void saveToFile(FILE * fOut, node * n, int isLast)
+{
+    if(n -> father != NULL)
+    {
+        fprintf(fOut, " max %d alt %d pred %d", n -> key, n -> level, n -> father -> key);
+    }
+    else
+    {
+        fprintf(fOut, " max %d alt %d pred NaN", n -> key, n -> level);
+    }
+    if(!isLast)
+    {
+        fputc('\n',fOut);
     }
 }
-
-
-void freeTree(tree * T) {
-    freeNode(T->root);
-    free(T);
-}
-
 
 int main()
 {
@@ -187,31 +169,45 @@ int main()
     char * line = (char*) malloc(lineMaxSize * sizeof(char));
 
     tree * T = initTree();
+    node * theBigOne;
 
     fgets(line, lineMaxSize, fileIn);
+    
     while(line != NULL)
     {
+
         slice = strtok(line, separator);
+        int x = atoi(slice);
+        node * tmp = insertTree(T, x);
+        fprintf(fileOut,"%d", tmp -> level);
+        theBigOne = tmp;
+        slice = strtok(NULL, separator);
+
         while (slice != NULL)
         {
-            int tmp = atoi(slice);    
-            printf("%d ", insertTree(T, tmp) -> level);
+            fputc(32, fileOut);
+            x = atoi(slice);
+            tmp = insertTree(T, x); 
+            if(tmp -> key > theBigOne -> key)
+            {
+                theBigOne = tmp;
+            }
+            fprintf(fileOut,"%d", tmp -> level);
             slice = strtok(NULL, separator);
 
         }
+
         if(fgets(line, lineMaxSize, fileIn) != NULL)
         {
-            freeTree(T);
+            saveToFile(fileOut, theBigOne, 0);
+            freeTree(T -> root);
             T = initTree();
-            printf("\n");
         }
         else{
-            freeTree(T);
-            T = initTree();
-            printf("\n> I'm at the last line, buddy!\n");
+            saveToFile(fileOut, theBigOne, 1);
+            freeTree(T -> root);
             break;
         }
-        T = initTree();
 
     }
 
