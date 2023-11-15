@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <stdlib.h>
+# define lineMaxSize 500
 
 typedef struct node
 {
@@ -15,6 +16,36 @@ typedef struct tree
 {
     node * root;
 } tree;
+
+
+int fileCreate (char * path) 
+{
+  FILE * fileTest;
+  fileTest = fopen(path, "w");
+
+  if(fileTest == NULL) 
+  {
+    return 0;
+  }
+
+  fclose(fileTest);
+  return 1;
+}
+
+
+int fileExists(char * path) 
+{
+  FILE * fileTest;
+  fileTest = fopen(path, "r");
+
+  if(fileTest == NULL) 
+  {
+    return 0;
+  }
+
+  fclose(fileTest);
+  return 1;
+}
 
 
 tree * initTree()
@@ -48,7 +79,7 @@ void insertTree(tree * T, int k)
     while(x != NULL)
     {
         y = x;
-        if(k > x -> key)
+        if(k >= x -> key)
         {
             x = x -> right;
         }
@@ -80,15 +111,36 @@ void insertTree(tree * T, int k)
 }
 
 
-int main(){
+int main()
+{
+    // Checking if both (input and output) files exists
+
+    if(!fileExists("L2Q1.in"))
+    {
+
+        printf("> Creeper, ohh man!\n");
+        return EXIT_FAILURE;
+
+    }
+    if(!fileExists("L2Q1.out"))
+    {
+
+        fileCreate("L2Q1.out");
+
+    }
+
+    FILE * fileIn = fopen("L2Q1.in", "r");
+    FILE * fileOut = fopen("L2Q1.out", "w");
+
+    char * slice;
+    char * line = (char*) malloc(lineMaxSize * sizeof(char));
+
     tree * T = initTree();
     insertTree(T, 5);
-    insertTree(T, 8);
-    insertTree(T, -1);
-    insertTree(T, 4);
     insertTree(T, 6);
-    insertTree(T, 9);
-    insertTree(T, 11);
-    insertTree(T, 15);
+    insertTree(T, 7);
+    insertTree(T, 6);
+    insertTree(T, 5);
+    insertTree(T, 4);
 
 }
