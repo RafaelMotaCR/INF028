@@ -1,5 +1,6 @@
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # define lineMaxSize 500
 
 typedef struct node
@@ -132,8 +133,32 @@ int main()
     FILE * fileIn = fopen("L2Q1.in", "r");
     FILE * fileOut = fopen("L2Q1.out", "w");
 
+    char * separator = " ";
     char * slice;
     char * line = (char*) malloc(lineMaxSize * sizeof(char));
+
+    fgets(line, lineMaxSize, fileIn);
+    while(line != NULL)
+    {
+        slice = strtok(line, separator);
+        while (slice != NULL)
+        {
+            int tmp = atoi(slice);
+            printf("%d ", tmp);
+            slice = strtok(NULL, separator);
+
+        }
+        if(fgets(line, lineMaxSize, fileIn) != NULL)
+        {
+            printf("\n");
+            //
+        }
+        else{
+            printf("\nI'm at the last line, buddy\n");
+            break;
+        }
+
+    }
 
     tree * T = initTree();
     insertTree(T, 5);
