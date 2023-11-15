@@ -21,12 +21,12 @@ typedef struct tree
 
 // Function prototypes
 
+node * createNode(int k);
 int fileCreate (char * path);
 int fileExists(char * path);
-tree * initTree();
-node * createNode(int k);
-node * insertTree(tree * T, int k);
 void freeTree(node * root);
+tree * initTree();
+node * insertTree(tree * T, int k);
 void saveToFile(FILE * fOut, node * n, int isLast);
 
 // Main function
@@ -140,6 +140,24 @@ int main()
 }
 
 
+node * createNode(int k)
+{
+    node * tmp = (node *) malloc(sizeof(node));
+
+    if(tmp != NULL)
+    {
+        tmp -> key = k;
+        tmp -> level = 0;
+        tmp -> right = NULL;
+        tmp -> left = NULL;
+        tmp -> father = NULL;
+    }
+
+    return tmp;
+
+}
+
+
 int fileCreate (char * path) 
 {
   FILE * fileTest;
@@ -170,29 +188,24 @@ int fileExists(char * path)
 }
 
 
+void freeTree(node * root) {
+
+    if (root == NULL) {
+        return;
+    }
+        
+
+    freeTree(root -> left);
+    freeTree(root -> right);
+    free(root);
+}
+
+
 tree * initTree()
 {
     tree * T = (tree*) malloc(sizeof(tree));
     T -> root = NULL;
     return T;
-}
-
-
-node * createNode(int k)
-{
-    node * tmp = (node *) malloc(sizeof(node));
-
-    if(tmp != NULL)
-    {
-        tmp -> key = k;
-        tmp -> level = 0;
-        tmp -> right = NULL;
-        tmp -> left = NULL;
-        tmp -> father = NULL;
-    }
-
-    return tmp;
-
 }
 
 
@@ -239,19 +252,6 @@ node * insertTree(tree * T, int k)
 }
 
 
-void freeTree(node * root) {
-
-    if (root == NULL) {
-        return;
-    }
-        
-
-    freeTree(root -> left);
-    freeTree(root -> right);
-    free(root);
-}
-
-
 void saveToFile(FILE * fOut, node * n, int isLast)
 {
     if(n -> father != NULL)
@@ -269,4 +269,3 @@ void saveToFile(FILE * fOut, node * n, int isLast)
     }
 
 }
-
