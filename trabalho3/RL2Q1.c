@@ -19,6 +19,122 @@ typedef struct tree
 } tree;
 
 
+// Function prototypes
+
+int fileCreate (char * path);
+int fileExists(char * path);
+tree * initTree();
+node * createNode(int k);
+node * insertTree(tree * T, int k);
+void freeTree(node * root);
+void saveToFile(FILE * fOut, node * n, int isLast);
+
+// Main function
+
+int main()
+{
+    // Checking if both (input and output) files exists
+
+    if(!fileExists("L2Q1.in"))
+    {
+        printf("> Creeper, ohh man!\n");
+        return EXIT_FAILURE;
+
+    }
+
+    if(!fileExists("L2Q1.out"))
+    {
+
+        fileCreate("L2Q1.out");
+
+    }
+
+    // If both files exists, open them 
+
+    FILE * fileIn = fopen("L2Q1.in", "r");
+    FILE * fileOut = fopen("L2Q1.out", "w");
+
+    // Uses " " (aka blank space) as separator
+    // Uses line to read each line of the input
+    // Uses "slice" to "broke" line in minor parts, separeted by "separator"
+
+    char * separator = " ";
+    char * slice;
+    char * line = (char*) malloc(lineMaxSize * sizeof(char));
+
+    // Main tree    
+    tree * T = initTree();
+
+    // Used to store the biggest num in the tree
+    node * theBigOne; 
+
+    fgets(line, lineMaxSize, fileIn);
+    
+    while(line != NULL)
+    {
+
+        /* Catches the first element, define them as the bigger
+        and inserts it into the tree */
+
+        slice = strtok(line, separator);
+        node * tmp = insertTree(T, atoi(slice));
+        fprintf(fileOut,"%d", tmp -> level);
+        theBigOne = tmp;
+
+        // Then, catches the next element
+
+        slice = strtok(NULL, separator);
+
+        while (slice != NULL)
+        {
+
+            fputc(32, fileOut); // Inserts a blank space between numbers in output
+            tmp = insertTree(T, atoi(slice)); 
+
+            /* If any number is greater than the "biggest" 
+            Then it becomes the new "biggest" */
+
+            if(tmp -> key > theBigOne -> key)
+            {
+                theBigOne = tmp;
+            }
+
+            // Saves the level of the last inserted number on the output file
+
+            fprintf(fileOut,"%d", tmp -> level);
+
+            // Goes to the next number
+
+            slice = strtok(NULL, separator);
+
+        }
+
+        /*Tests whether the end of the file has been reached.
+        If not, restart the tree and save the 
+        data from the highest number.*/
+
+        if(fgets(line, lineMaxSize, fileIn) != NULL)
+        {
+
+            saveToFile(fileOut, theBigOne, 0);
+            freeTree(T -> root);
+            theBigOne = NULL;
+            T = initTree();
+
+        }
+        else{
+
+            saveToFile(fileOut, theBigOne, 1);
+            freeTree(T -> root);
+            break;
+
+        }
+
+    }
+
+}
+
+
 int fileCreate (char * path) 
 {
   FILE * fileTest;
@@ -60,6 +176,7 @@ tree * initTree()
 node * createNode(int k)
 {
     node * tmp = (node *) malloc(sizeof(node));
+
     if(tmp != NULL)
     {
         tmp -> key = k;
@@ -68,7 +185,9 @@ node * createNode(int k)
         tmp -> left = NULL;
         tmp -> father = NULL;
     }
+
     return tmp;
+
 }
 
 
@@ -117,11 +236,13 @@ node * insertTree(tree * T, int k)
 
 void freeTree(node * root) {
 
-    if (root == NULL) 
+    if (root == NULL) {
         return;
+    }
+        
 
-    freeTree(root->left);
-    freeTree(root->right);
+    freeTree(root -> left);
+    freeTree(root -> right);
     free(root);
 }
 
@@ -136,79 +257,11 @@ void saveToFile(FILE * fOut, node * n, int isLast)
     {
         fprintf(fOut, " max %d alt %d pred NaN", n -> key, n -> level);
     }
+
     if(!isLast)
     {
         fputc('\n',fOut);
     }
-}
-
-int main()
-{
-    // Checking if both (input and output) files exists
-
-    if(!fileExists("L2Q1.in"))
-    {
-
-        printf("> Creeper, ohh man!\n");
-        return EXIT_FAILURE;
-
-    }
-
-    if(!fileExists("L2Q1.out"))
-    {
-
-        fileCreate("L2Q1.out");
-
-    }
-
-    FILE * fileIn = fopen("L2Q1.in", "r");
-    FILE * fileOut = fopen("L2Q1.out", "w");
-
-    char * separator = " ";
-    char * slice;
-    char * line = (char*) malloc(lineMaxSize * sizeof(char));
-
-    tree * T = initTree();
-    node * theBigOne;
-
-    fgets(line, lineMaxSize, fileIn);
-    
-    while(line != NULL)
-    {
-
-        slice = strtok(line, separator);
-        int x = atoi(slice);
-        node * tmp = insertTree(T, x);
-        fprintf(fileOut,"%d", tmp -> level);
-        theBigOne = tmp;
-        slice = strtok(NULL, separator);
-
-        while (slice != NULL)
-        {
-            fputc(32, fileOut);
-            x = atoi(slice);
-            tmp = insertTree(T, x); 
-            if(tmp -> key > theBigOne -> key)
-            {
-                theBigOne = tmp;
-            }
-            fprintf(fileOut,"%d", tmp -> level);
-            slice = strtok(NULL, separator);
-
-        }
-
-        if(fgets(line, lineMaxSize, fileIn) != NULL)
-        {
-            saveToFile(fileOut, theBigOne, 0);
-            freeTree(T -> root);
-            T = initTree();
-        }
-        else{
-            saveToFile(fileOut, theBigOne, 1);
-            freeTree(T -> root);
-            break;
-        }
-
-    }
 
 }
+
