@@ -9,7 +9,6 @@ typedef struct node
     struct node * left;
     struct node * father;
     int key;
-    int level;
 } node;
 
 
@@ -17,6 +16,113 @@ typedef struct tree
 {
     node * root;
 } tree;
+
+// Function prototypes
+
+int calcSum(node * x);
+node * createNode(int k);
+int fileCreate (char * path);
+int fileExists(char * path);
+void freeTree(node * root);
+tree * initTree();
+void inorderTreeSave(FILE * fOut, node * x);
+node * insertTree(tree * T, int k);
+int totalLR(node * x);
+
+// Main function
+
+
+int main(){
+    // Checking if both (input and output) files exists
+
+    if(!fileExists("L2Q2.in"))
+    {
+        printf("> Creeper, ohh man!\n");
+        return EXIT_FAILURE;
+
+    }
+
+    if(!fileExists("L2Q2.out"))
+    {
+
+        fileCreate("L2Q2.out");
+
+    }
+
+    // If both files exists, open them 
+
+    FILE * fileIn = fopen("L2Q2.in", "r");
+    FILE * fileOut = fopen("L2Q2.out", "w");
+
+    // Uses " " (aka blank space) as separator
+    // Uses line to read each line of the input
+    // Uses "slice" to "broke" line in minor parts, separeted by "separator"
+
+    char * separator = " ";
+    char * slice;
+    char * line = (char*) malloc(lineMaxSize * sizeof(char));
+
+    tree * T = initTree();
+
+    int x;
+
+    fgets(line, lineMaxSize, fileIn);
+
+    while(line != NULL)
+    {
+        slice = strtok(line, separator);
+
+        while(slice != NULL)
+        {
+            x = atoi(slice);
+            insertTree(T, x);
+            slice = strtok(NULL, separator);
+        }
+        if(fgets(line, lineMaxSize, fileIn) != NULL)
+        {
+            inorderTreeSave(fileOut, T -> root);
+            fputc('\n', fileOut);
+            freeTree(T -> root);
+            T = initTree();
+        }
+        else
+        {
+            inorderTreeSave(fileOut, T -> root);
+            freeTree(T -> root);
+            break;
+        }
+
+    }
+
+    fclose(fileIn);
+    fclose(fileOut);
+    free(T);
+    free(line);
+    return EXIT_SUCCESS;
+}
+
+// Functions
+
+int calcSum(node * x)
+{
+    int sumLeft = totalLR(x -> left);
+    int sumRight = totalLR(x -> right);
+    int total = sumRight - sumLeft;
+    return total;
+}
+
+
+node * createNode(int k){
+    node * tmp = (node*) malloc(sizeof(node));
+    if(tmp!= NULL)
+    {
+        tmp -> key = k;
+        tmp -> father = NULL;
+        tmp -> left = NULL;
+        tmp -> right = NULL;
+    }
+    return tmp;
+}
 
 
 int fileCreate (char * path) 
@@ -49,17 +155,17 @@ int fileExists(char * path)
 }
 
 
-node * createNode(int k){
-    node * tmp = (node*) malloc(sizeof(node));
-    if(tmp!= NULL)
+void freeTree(node * root)
+{
+
+    if (root == NULL)
     {
-        tmp -> key = k;
-        tmp -> level = 0;
-        tmp -> father = NULL;
-        tmp -> left = NULL;
-        tmp -> right = NULL;
+        return;
     }
-    return tmp;
+
+    freeTree(root -> left);
+    freeTree(root -> right);
+    free(root);
 }
 
 
@@ -76,21 +182,56 @@ tree * initTree()
 }
 
 
+void inorderTreeSave(FILE * fOut, node * x) 
+{
+    if (x == NULL) 
+    {
+        return;
+    }
+
+    node * current = x;
+    node * stack[100];  // Assuming a maximum of 100 nodes in the stack
+    int top = - 1;  // Initialize top of stack
+
+    while (current != NULL || top != - 1) 
+    {
+        // Traverse to the leftmost leaf
+        while (current != NULL) 
+        {
+            stack[++top] = current;
+            current = current -> left;
+        }
+
+        // Visit the top of the stack
+
+        current = stack[top--];
+        int total = calcSum(current);
+        fprintf(fOut, "%d", current -> key);
+        fprintf(fOut, " (%d)" , total);
+
+        // Move to the right subtree
+        
+        current = current -> right;
+
+        if(!(top == - 1 && current == NULL))
+        {
+            fputc(32, fOut);
+        }
+    }
+}
+
+
 node * insertTree(tree * T, int k)
 {
     node * x = T -> root;
     node * y = NULL;
     node * new = createNode(k);
-    int level = 0;
     while(x != NULL)
     {
         y = x;
-        level = level + 1;
         if(k == x -> key){
             free(new);
-            node * flag = (node*) malloc(sizeof(node));
-            flag -> level = 99;
-            return flag;
+            return NULL;
         }
         else if(k > x -> key)
         {
@@ -102,7 +243,6 @@ node * insertTree(tree * T, int k)
     }
     
     new -> father = y;
-    new -> level = level;
     
     if(y == NULL){
         T -> root = new;
@@ -127,35 +267,4 @@ int totalLR(node * x)
     sum += totalLR(x -> left);
     sum += totalLR(x -> right);
     return sum;
-}
-
-
-void inorder(tree * T, node * x)
-{
-    if(x != NULL)
-    {
-        inorder(T, x -> left);
-        printf("%d ", x -> key);
-        printf("(%d) ", totalLR(x -> right) - totalLR(x -> left));
-        inorder(T, x -> right);
-    }
-}
-
-
-int main(){
-    tree * T = initTree();
-    insertTree(T,15);
-    insertTree(T,2);
-    insertTree(T,5);
-    insertTree(T,19);
-    insertTree(T,2);
-    insertTree(T,22);
-    insertTree(T,4);
-    insertTree(T,9);
-    insertTree(T,0);
-    insertTree(T,3);
-    insertTree(T,4);
-    insertTree(T,5);
-    inorder(T, T -> root);
-    return EXIT_SUCCESS;
 }

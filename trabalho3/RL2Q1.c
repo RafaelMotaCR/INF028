@@ -68,6 +68,9 @@ int main()
     // Used to store the biggest num in the tree
     node * theBigOne; 
 
+    // Used to temporaly store int numbers 
+    int x; 
+
     fgets(line, lineMaxSize, fileIn);
     
     while(line != NULL)
@@ -77,7 +80,8 @@ int main()
         and inserts it into the tree */
 
         slice = strtok(line, separator);
-        node * tmp = insertTree(T, atoi(slice));
+        x = atoi(slice);
+        node * tmp = insertTree(T, x);
         fprintf(fileOut,"%d", tmp -> level);
         theBigOne = tmp;
 
@@ -89,7 +93,8 @@ int main()
         {
 
             fputc(32, fileOut); // Inserts a blank space between numbers in output
-            tmp = insertTree(T, atoi(slice)); 
+            int x = atoi(slice);
+            tmp = insertTree(T, x); 
 
             /* If any number is greater than the "biggest" 
             Then it becomes the new "biggest" */
@@ -136,9 +141,11 @@ int main()
     fclose(fileOut);
     free(T);
     free(line);
+    return EXIT_SUCCESS;
 
 }
 
+// Functions
 
 node * createNode(int k)
 {
