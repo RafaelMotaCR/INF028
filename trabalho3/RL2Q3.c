@@ -82,20 +82,79 @@ node * insertTree(tree * T, int k)
     {
         y -> left = new;
     }
+
 }
 
 
-node * treeMinimum(node * x)
+node * treeMinimum(node * x) {
+    return (x -> left != NULL) ? treeMinimum(x -> left) : x;
+}
+
+
+
+node * treeSearch(node * x, int k)
 {
 
-    if(x != NULL)
+    if(x != NULL && x -> key != k)
     {
-        treeMinimum(x -> left);
+        if(k > x -> key)
+        {
+            return treeSearch(x -> right, k);
+        }
+        else
+        {
+            return treeSearch(x -> left, k);
+        }
+
     }
-    
+
     return x;
+
 }
 
+
+void treeDelete(tree * T, int k)
+{
+
+    node * z = treeSearch(T -> root, k);
+    node * y;
+    node * x;
+
+    if(z -> left == NULL || z -> right == NULL){
+        y = z; 
+    }  
+    else{
+        y = treeSuccessor(z);  
+    } 
+
+    if(y -> left != NULL){
+        x = y -> left; 
+    } 
+    else{
+        x = y -> right; 
+    } 
+
+    if(x!=NULL){
+        x -> father = y -> father; 
+    } 
+
+    if(y -> father == NULL){
+      T -> root = x;
+    } 
+    else{
+        if(y == y -> father -> left){
+            y -> father -> left =  x;
+
+        } 
+        else{
+            y -> father -> right = x; 
+        }
+    }
+    if(y != z){
+        z -> key = y -> key;
+    } 
+    free(y);
+}
 
 int main(){
 
