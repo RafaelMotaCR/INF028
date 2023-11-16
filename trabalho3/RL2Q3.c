@@ -1,6 +1,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
+# define lineMaxSize 500
 
 typedef struct node
 {
@@ -33,6 +34,35 @@ node * createNode(int k)
 
     return tmp;
 
+}
+
+int fileCreate (char * path) 
+{
+  FILE * fileTest;
+  fileTest = fopen(path, "w");
+
+  if(fileTest == NULL) 
+  {
+    return 0;
+  }
+
+  fclose(fileTest);
+  return 1;
+}
+
+
+int fileExists(char * path) 
+{
+  FILE * fileTest;
+  fileTest = fopen(path, "r");
+
+  if(fileTest == NULL) 
+  {
+    return 0;
+  }
+
+  fclose(fileTest);
+  return 1;
 }
 
 
@@ -82,7 +112,7 @@ node * insertTree(tree * T, int k)
     {
         y -> left = new;
     }
-
+    return new;
 }
 
 
@@ -113,6 +143,19 @@ node * treeSearch(node * x, int k)
 }
 
 
+node * treeSuccessor(node * x){
+    if(x -> right != NULL){
+        return treeMinimum(x -> right);
+    }
+    node * y = x -> father; 
+    while(y != NULL  && x == y -> right){
+        x = y;
+        y = y -> father;
+    }
+    return y;
+}
+
+
 void treeDelete(tree * T, int k)
 {
 
@@ -134,7 +177,7 @@ void treeDelete(tree * T, int k)
         x = y -> right; 
     } 
 
-    if(x!=NULL){
+    if(x != NULL){
         x -> father = y -> father; 
     } 
 
@@ -156,8 +199,65 @@ void treeDelete(tree * T, int k)
     free(y);
 }
 
+
 int main(){
 
+    // Checking if both (input and output) files exists
+
+    if(!fileExists("L2Q3.in"))
+    {
+        printf("> Creeper, ohh man!\n");
+        return EXIT_FAILURE;
+
+    }
+
+    if(!fileExists("L2Q3.out"))
+    {
+
+        fileCreate("L2Q3.out");
+
+    }
+
+    // If both files exists, open them 
+
+    FILE * fileIn = fopen("L2Q3.in", "r");
+    FILE * fileOut = fopen("L2Q3.out", "w");
+
+    // Uses " " (aka blank space) as separator
+    // Uses line to read each line of the input
+    // Uses "slice" to "broke" line in minor parts, separeted by "separator"
+
+    char * separator = " ";
+    char * slice;
+    char * line = (char*) malloc(lineMaxSize * sizeof(char));
+
+    tree * T = initTree();
+
+    int x;
+
+    fgets(line, lineMaxSize, fileIn);
+    while(line != NULL)
+    {
+
+        slice = strtok(line, separator);
+
+        while(slice != NULL)
+        {
+            printf(" %s ", slice);
+            slice = strtok(NULL, separator);
+
+        }
+
+        if(fgets(line, lineMaxSize, fileIn) != NULL)
+        {
+
+        }
+        else
+        {
+            break;
+        }
+
+    }
 
     return EXIT_SUCCESS;
 }
