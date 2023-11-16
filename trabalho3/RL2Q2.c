@@ -25,7 +25,7 @@ int fileCreate (char * path);
 int fileExists(char * path);
 void freeTree(node * root);
 tree * initTree();
-void inorderTreeSave(FILE * fOut, node * x);
+void inorderTreeSave(FILE * fOut, node * x, int isLast);
 node * insertTree(tree * T, int k);
 int totalLR(node * x);
 
@@ -80,14 +80,13 @@ int main(){
         }
         if(fgets(line, lineMaxSize, fileIn) != NULL)
         {
-            inorderTreeSave(fileOut, T -> root);
-            fputc('\n', fileOut);
+            inorderTreeSave(fileOut, T -> root, 0);
             freeTree(T -> root);
             T = initTree();
         }
         else
         {
-            inorderTreeSave(fileOut, T -> root);
+            inorderTreeSave(fileOut, T -> root, 1);
             freeTree(T -> root);
             break;
         }
@@ -182,7 +181,7 @@ tree * initTree()
 }
 
 
-void inorderTreeSave(FILE * fOut, node * x) 
+void inorderTreeSave(FILE * fOut, node * x, int isLast) 
 {
     if (x == NULL) 
     {
@@ -217,6 +216,9 @@ void inorderTreeSave(FILE * fOut, node * x)
         {
             fputc(32, fOut);
         }
+    }
+    if(!isLast){
+        fputc(10, fOut);
     }
 }
 

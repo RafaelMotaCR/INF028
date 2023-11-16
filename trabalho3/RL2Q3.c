@@ -66,6 +66,20 @@ int fileExists(char * path)
 }
 
 
+void freeTree(node * root)
+{
+
+    if (root == NULL)
+    {
+        return;
+    }
+
+    freeTree(root -> left);
+    freeTree(root -> right);
+    free(root);
+}
+
+
 tree * initTree()
 {
 
@@ -81,12 +95,11 @@ node * insertTree(tree * T, int k)
     node * x = T -> root;
     node * y = NULL;
     node * new = createNode(k);
-    int level = 0;
+    int treeLvl = 0;
 
     while(x != NULL)
     {
         y = x;
-        level = level + 1;
         if(new -> key >= x -> key)
         {
             x = x -> right;
@@ -95,10 +108,11 @@ node * insertTree(tree * T, int k)
         {
             x = x -> left;
         }
+        treeLvl = treeLvl + 1;
     }
 
     new -> father = y;
-    new -> level = level;
+    new -> level = treeLvl;
 
     if(y == NULL)
     {
@@ -178,11 +192,14 @@ void treeDelete(tree * T, int k)
     } 
 
     if(x != NULL){
-        x -> father = y -> father; 
+        x -> father = y -> father;
+        x -> level -= 1;
     } 
 
     if(y -> father == NULL){
+
       T -> root = x;
+    
     } 
     else{
         if(y == y -> father -> left){
@@ -191,12 +208,79 @@ void treeDelete(tree * T, int k)
         } 
         else{
             y -> father -> right = x; 
-        }
+        }  
     }
     if(y != z){
         z -> key = y -> key;
     } 
     free(y);
+}
+
+void modifyTree(tree * T, char * slice, int command)
+{
+    if(slice == NULL)
+    {
+        return;
+    }
+    int tmp = atoi(slice);
+
+    if(command)
+    {
+        insertTree(T, tmp);
+    }
+    else
+    {
+        if(treeSearch(T-> root, tmp) == NULL)
+        {
+            insertTree(T, tmp);
+        }
+        else
+        {
+            treeDelete(T, tmp);
+        }
+    }
+}
+
+
+void inorderTreeSave(FILE * fOut, node * x, int isLast) 
+{
+    if (x == NULL) 
+    {
+        return;
+    }
+
+    node * current = x;
+    node * stack[100];  // Assuming a maximum of 100 nodes in the stack
+    int top = - 1;  // Initialize top of stack
+
+    while (current != NULL || top != - 1) 
+    {
+        // Traverse to the leftmost leaf
+        while (current != NULL) 
+        {
+            stack[++top] = current;
+            current = current -> left;
+        }
+
+        // Visit the top of the stack
+
+        current = stack[top--];
+
+        fprintf(fOut, "%d", current -> key);
+        fprintf(fOut, " (%d)" , current -> level);
+
+        // Move to the right subtree
+        
+        current = current -> right;
+
+        if(!(top == - 1 && current == NULL))
+        {
+            fputc(32, fOut);
+        }
+    }
+    if(!isLast){
+        fputc(10,fOut);
+    }
 }
 
 
@@ -233,9 +317,8 @@ int main(){
 
     tree * T = initTree();
 
-    int x;
-
     fgets(line, lineMaxSize, fileIn);
+
     while(line != NULL)
     {
 
@@ -243,17 +326,32 @@ int main(){
 
         while(slice != NULL)
         {
-            printf(" %s ", slice);
+            if(strcmp(slice, "a") == 0)   
+            {
+
+                slice = strtok(NULL, separator);
+                modifyTree(T, slice, 1);
+
+            }
+            else if(strcmp(slice, "r") == 0)   
+            {
+
+                slice = strtok(NULL, separator);
+                modifyTree(T, slice, 0);
+
+            }
             slice = strtok(NULL, separator);
-
         }
-
         if(fgets(line, lineMaxSize, fileIn) != NULL)
         {
-
+            inorderTreeSave(fileOut, T -> root, 0);
+            freeTree(T  -> root);
+            T = initTree();
         }
         else
         {
+            inorderTreeSave(fileOut, T -> root, 1);
+            freeTree(T -> root);
             break;
         }
 
