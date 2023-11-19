@@ -15,9 +15,10 @@ typedef struct tree {
   node *root;
 } tree;
 
+
 node *createNode(int k);
 int fileCreate(char *path);
-int fileCreate(char *path);
+int fileExists(char *path);
 void freeTree(node *root);
 tree *initTree();
 void inorderTreeSave(FILE *fOut, node *x, int isLast);
@@ -89,12 +90,15 @@ int main() {
       break;
     }
   }
+
   free(T);
   free(line);
   fclose(fileOut);
   fclose(fileIn);
   return EXIT_SUCCESS;
+
 }
+
 
 node *createNode(int k) {
   node *tmp = (node *)malloc(sizeof(node));
@@ -110,6 +114,7 @@ node *createNode(int k) {
   return tmp;
 }
 
+
 int fileCreate(char *path) {
   FILE *fileTest;
   fileTest = fopen(path, "w");
@@ -121,6 +126,7 @@ int fileCreate(char *path) {
   fclose(fileTest);
   return 1;
 }
+
 
 int fileExists(char *path) {
   FILE *fileTest;
@@ -298,6 +304,7 @@ node *treeMinimum(node *x) {
   return (x->left != NULL) ? treeMinimum(x->left) : x;
 }
 
+
 node *treeSearch(node *x, int k) {
 
   if (x != NULL && x->key != k) {
@@ -323,4 +330,3 @@ node *treeSuccessor(node *x) {
   }
   return y;
 }
-
