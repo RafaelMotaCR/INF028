@@ -20,14 +20,16 @@ int fileCreate(char *path);
 int fileCreate(char *path);
 void freeTree(node *root);
 tree *initTree();
+void inorderTreeSave(FILE *fOut, node *x, int isLast);
 node *insertTree(tree *T, int k);
+void levelCorrector(node * x);
+void modifyTree(tree *T, char *slice, int command);
+void treeDelete(tree *T, int k);
 node *treeMinimum(node *x);
 node *treeSearch(node *x, int k);
 node *treeSuccessor(node *x);
 node *treeSuccessor(node *x);
-void treeDelete(tree *T, int k);
-void modifyTree(tree *T, char *slice, int command);
-void inorderTreeSave(FILE *fOut, node *x, int isLast);
+
 
 int main() {
 
@@ -150,122 +152,6 @@ tree *initTree() {
   return T;
 }
 
-node *insertTree(tree *T, int k) {
-
-  node *x = T->root;
-  node *y = NULL;
-  node *new = createNode(k);
-  int treeLvl = 0;
-
-  while (x != NULL) {
-    y = x;
-    if (new->key >= x->key) {
-      x = x->right;
-    } else {
-      x = x->left;
-    }
-    treeLvl = treeLvl + 1;
-  }
-
-  new->father = y;
-  new->level = treeLvl;
-
-  if (y == NULL) {
-    T->root = new;
-  } else if (new->key > y->key) {
-    y->right = new;
-  } else {
-    y->left = new;
-  }
-  return new;
-}
-
-node *treeMinimum(node *x) {
-  return (x->left != NULL) ? treeMinimum(x->left) : x;
-}
-
-node *treeSearch(node *x, int k) {
-
-  if (x != NULL && x->key != k) {
-    if (k > x->key) {
-      return treeSearch(x->right, k);
-    } else {
-      return treeSearch(x->left, k);
-    }
-  }
-
-  return x;
-}
-
-node *treeSuccessor(node *x) {
-  if (x->right != NULL) {
-    return treeMinimum(x->right);
-  }
-  node *y = x->father;
-  while (y != NULL && x == y->right) {
-    x = y;
-    y = y->father;
-  }
-  return y;
-}
-
-void treeDelete(tree *T, int k) {
-
-  node *z = treeSearch(T->root, k);
-  node *y;
-  node *x;
-
-  if (z->left == NULL || z->right == NULL) {
-    y = z;
-  } else {
-    y = treeSuccessor(z);
-  }
-
-  if (y->left != NULL) {
-    x = y->left;
-  } else {
-    x = y->right;
-  }
-
-  if (x != NULL) {
-    x->father = y->father;
-    x->level -= 1;
-  }
-
-  if (y->father == NULL) {
-
-    T->root = x;
-
-  } else {
-    if (y == y->father->left) {
-      y->father->left = x;
-
-    } else {
-      y->father->right = x;
-    }
-  }
-  if (y != z) {
-    z->key = y->key;
-  }
-  free(y);
-}
-
-void modifyTree(tree *T, char *slice, int command) {
-  if (slice == NULL) {
-    return;
-  }
-  int tmp = atoi(slice);
-
-  if (command) {
-    insertTree(T, tmp);
-  } else {
-    if (treeSearch(T->root, tmp) == NULL) {
-      insertTree(T, tmp);
-    } else {
-      treeDelete(T, tmp);
-    }
-  }
-}
 
 void inorderTreeSave(FILE *fOut, node *x, int isLast) {
   if (x == NULL) {
@@ -302,3 +188,139 @@ void inorderTreeSave(FILE *fOut, node *x, int isLast) {
     fputc(10, fOut);
   }
 }
+
+
+node *insertTree(tree *T, int k) {
+
+  node *x = T->root;
+  node *y = NULL;
+  node *new = createNode(k);
+  int treeLvl = 0;
+
+  while (x != NULL) {
+    y = x;
+    if (new->key >= x->key) {
+      x = x -> right;
+    } else {
+      x = x -> left;
+    }
+    treeLvl = treeLvl + 1;
+  }
+
+  new -> father = y;
+  new -> level = treeLvl;
+
+  if (y == NULL) {
+    T -> root = new;
+  } else if (new -> key > y -> key) {
+    y -> right = new;
+  } else {
+    y -> left = new;
+  }
+  return new;
+}
+
+
+void levelCorrector(node * x){
+
+    if(x != NULL){
+
+        levelCorrector(x -> left);
+        x -> level = x -> level - 1; 
+        levelCorrector(x -> right);
+
+    }
+
+}
+
+
+void modifyTree(tree *T, char *slice, int command) {
+  if (slice == NULL) {
+    return;
+  }
+  int tmp = atoi(slice);
+
+  if (command) {
+    insertTree(T, tmp);
+  } else {
+    if (treeSearch(T->root, tmp) == NULL) {
+      insertTree(T, tmp);
+    } else {
+      treeDelete(T, tmp);
+    }
+  }
+}
+
+
+void treeDelete(tree * T, int k) {
+
+  node * z = treeSearch(T -> root, k);
+  node * y;
+  node * x;
+
+  if (z -> left == NULL || z -> right == NULL) {
+    y = z;
+  } else {
+    y = treeSuccessor(z);
+  }
+
+  if (y->left != NULL) {
+    x = y -> left;
+  } else {
+    x = y -> right;
+  }
+
+  if (x != NULL) {
+    x -> father = y -> father;
+    levelCorrector(x);
+  }
+
+  if (y->father == NULL) {
+
+    T->root = x;
+
+  } else {
+    if (y == y -> father -> left) {
+      y -> father -> left = x;
+
+    } else {
+      y -> father -> right = x;
+    }
+  }
+  if (y != z) {
+    z -> key = y -> key;
+  }
+  free(y);
+}
+
+
+node *treeMinimum(node *x) {
+  return (x->left != NULL) ? treeMinimum(x->left) : x;
+}
+
+node *treeSearch(node *x, int k) {
+
+  if (x != NULL && x->key != k) {
+    if (k > x->key) {
+      return treeSearch(x->right, k);
+    } else {
+      return treeSearch(x->left, k);
+    }
+  }
+
+  return x;
+}
+
+
+node *treeSuccessor(node *x) {
+  if (x->right != NULL) {
+    return treeMinimum(x->right);
+  }
+  node *y = x->father;
+  while (y != NULL && x == y->right) {
+    x = y;
+    y = y->father;
+  }
+  return y;
+}
+
