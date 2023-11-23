@@ -22,6 +22,6 @@ Status: Concluído com sucesso! ☑️
 
 > Objetivo: Trabalho envolvendo árvores binárias e manipulação de arquivos em C.
 
-Status: Concluído com sucesso! ☑️
+Status: Passando por correções...
 ##
 
