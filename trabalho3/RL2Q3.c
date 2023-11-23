@@ -278,7 +278,7 @@ void treeDelete(tree * T, int k) {
 
   if (x != NULL) {
     x -> father = y -> father;
-    levelCorrector(x);
+   levelCorrector(x);
   }
 
   if (y->father == NULL) {
