@@ -25,6 +25,7 @@ void inorderTreeSave(FILE *fOut, node *x, int isLast);
 node *insertTree(tree *T, int k);
 void levelCorrector(node * x);
 void modifyTree(tree *T, char *slice, int command);
+void printTree(node * root, int space);
 void treeDelete(tree *T, int k);
 node *treeMinimum(node *x);
 node *treeSearch(node *x, int k);
@@ -247,14 +248,43 @@ void modifyTree(tree *T, char *slice, int command) {
   int tmp = atoi(slice);
 
   if (command) {
+    printf("INSERT!(%d)\n", tmp);
     insertTree(T, tmp);
   } else {
     if (treeSearch(T->root, tmp) == NULL) {
+      printf("INSERT!(%d)\n", tmp);
       insertTree(T, tmp);
     } else {
+      printf("DELETE!(%d)\n", tmp);
       treeDelete(T, tmp);
     }
   }
+  printTree(T -> root, 7);
+  printf("=======================================\n");
+}
+
+
+void printTree(node * root, int space) {
+    // Base case
+    if (root == NULL) {
+        return;
+    }
+
+    // Increase distance between levels
+    space += 5;
+
+    // Process right child first
+    printTree(root->right, space);
+
+    // Print current node after space
+    printf("\n");
+    for (int i = 5; i < space; i++) {
+        printf(" ");
+    }
+    printf("%d\n", root->key);
+
+    // Process left child
+    printTree(root->left, space);
 }
 
 
