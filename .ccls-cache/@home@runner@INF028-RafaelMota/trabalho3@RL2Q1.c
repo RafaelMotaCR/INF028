@@ -27,6 +27,8 @@ int fileExists(char * path);
 void freeTree(node * root);
 tree * initTree();
 node * insertTree(tree * T, int k);
+node *treeMinimum(node *x);
+node * treeSuccessor(node *x);
 void saveToFile(FILE * fOut, node * n, int isLast);
 
 // Main function
@@ -58,7 +60,7 @@ int main()
     // Uses line to read each line of the input
     // Uses "slice" to "broke" line in minor parts, separeted by "separator"
 
-    char * separator = " ";
+    char * separator = " \n";
     char * slice;
     char * line = (char*) malloc(lineMaxSize * sizeof(char));
 
@@ -260,9 +262,10 @@ node * insertTree(tree * T, int k)
 
 void saveToFile(FILE * fOut, node * n, int isLast)
 {
-    if(n -> father != NULL)
+    node * x = treeSuccessor(n);
+    if(x != NULL)
     {
-        fprintf(fOut, " max %d alt %d pred %d", n -> key, n -> level, n -> father -> key);
+        fprintf(fOut, " max %d alt %d pred %d", n -> key, n -> level, x -> key);
     }
     else
     {
@@ -275,3 +278,22 @@ void saveToFile(FILE * fOut, node * n, int isLast)
     }
 
 }
+
+
+node *treeMinimum(node *x) {
+  return (x->left != NULL) ? treeMinimum(x->left) : x;
+}
+
+
+node *treeSuccessor(node *x) {
+  if (x->left != NULL) {
+    return treeMinimum(x->left);
+  }
+  node *y = x->father;
+  while (y != NULL && x == y->left) {
+    x = y;
+    y = y->father;
+  }
+  return y;
+}
+

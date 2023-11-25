@@ -56,7 +56,7 @@ int main() {
   // Uses line to read each line of the input
   // Uses "slice" to "broke" line in minor parts, separeted by "separator"
 
-  char *separator = " ";
+  char * separator = " \n";
   char *slice;
   char *line = (char *)malloc(lineMaxSize * sizeof(char));
 
